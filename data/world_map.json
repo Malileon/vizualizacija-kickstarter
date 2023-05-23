@@ -57,7 +57,7 @@
             [[47]]
           ],
           "id": "124",
-          "properties": { "name": "Canada" }
+          "properties": { "name": "Canada", "kickstarter": "yes" }
         },
         {
           "type": "MultiPolygon",
@@ -74,7 +74,7 @@
             [[59]]
           ],
           "id": "840",
-          "properties": { "name": "United States of America" }
+          "properties": { "name": "United States", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -208,7 +208,7 @@
           "type": "MultiPolygon",
           "arcs": [[[169]], [[-161, 170, 171, 172]], [[173]], [[174]]],
           "id": "578",
-          "properties": { "name": "Norway" }
+          "properties": { "name": "Norway", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -244,7 +244,7 @@
           "type": "Polygon",
           "arcs": [[-50, 186, 187, 188, 189]],
           "id": "484",
-          "properties": { "name": "Mexico" }
+          "properties": { "name": "Mexico", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -344,7 +344,7 @@
             [[245]]
           ],
           "id": "250",
-          "properties": { "name": "France" }
+          "properties": { "name": "France", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -746,7 +746,7 @@
           "type": "Polygon",
           "arcs": [[-172, 429, 430]],
           "id": "752",
-          "properties": { "name": "Sweden" }
+          "properties": { "name": "Sweden", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -770,7 +770,7 @@
           "type": "Polygon",
           "arcs": [[448, 449, 450, 451, 452, 453, 454]],
           "id": "040",
-          "properties": { "name": "Austria" }
+          "properties": { "name": "Austria", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -812,7 +812,7 @@
           "type": "Polygon",
           "arcs": [[-446, 469, -453, 470, -238, 471, 472, 473, 474, 475, 476]],
           "id": "276",
-          "properties": { "name": "Germany" }
+          "properties": { "name": "Germany", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -848,25 +848,25 @@
           "type": "Polygon",
           "arcs": [[-452, 499, -239, -471]],
           "id": "756",
-          "properties": { "name": "Switzerland" }
+          "properties": { "name": "Switzerland", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
           "arcs": [[-472, -245, 500]],
           "id": "442",
-          "properties": { "name": "Luxembourg" }
+          "properties": { "name": "Luxembourg", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
           "arcs": [[-473, -501, -244, 501, 502]],
           "id": "056",
-          "properties": { "name": "Belgium" }
+          "properties": { "name": "Belgium", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
           "arcs": [[-474, -503, 503]],
           "id": "528",
-          "properties": { "name": "Netherlands" }
+          "properties": { "name": "Netherlands", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -878,13 +878,13 @@
           "type": "Polygon",
           "arcs": [[-505, 506, -242, 507]],
           "id": "724",
-          "properties": { "name": "Spain" }
+          "properties": { "name": "Spain", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
           "arcs": [[508, 509]],
           "id": "372",
-          "properties": { "name": "Ireland" }
+          "properties": { "name": "Ireland", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -902,13 +902,13 @@
           "type": "MultiPolygon",
           "arcs": [[[516]], [[517]]],
           "id": "554",
-          "properties": { "name": "New Zealand" }
+          "properties": { "name": "New Zealand", "kickstarter": "yes" }
         },
         {
           "type": "MultiPolygon",
           "arcs": [[[518]], [[519]]],
           "id": "036",
-          "properties": { "name": "Australia" }
+          "properties": { "name": "Australia", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -940,19 +940,19 @@
           "type": "MultiPolygon",
           "arcs": [[[-451, 524, 525, -240, -500]], [[526]], [[527]]],
           "id": "380",
-          "properties": { "name": "Italy" }
+          "properties": { "name": "Italy", "kickstarter": "yes" }
         },
         {
           "type": "MultiPolygon",
           "arcs": [[[-476, 528]], [[529]]],
           "id": "208",
-          "properties": { "name": "Denmark" }
+          "properties": { "name": "Denmark", "kickstarter": "yes" }
         },
         {
           "type": "MultiPolygon",
           "arcs": [[[-510, 530]], [[531]]],
           "id": "826",
-          "properties": { "name": "United Kingdom" }
+          "properties": { "name": "United Kingdom", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",
@@ -1032,7 +1032,7 @@
           "type": "MultiPolygon",
           "arcs": [[[554]], [[555]], [[556]]],
           "id": "392",
-          "properties": { "name": "Japan" }
+          "properties": { "name": "Japan", "kickstarter": "yes" }
         },
         {
           "type": "Polygon",

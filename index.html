@@ -19,13 +19,6 @@
         const path = d3.geoPath(projection);
 
         const g = svg.append('g');
-
-        d3.json('data/world_map.json').then(data => {
-            const countries = topojson.feature(data, data.objects.countries);
-
-            g.selectAll('path').data(countries.features).enter().append('path').attr('class', 'country').attr('id', d => d.properties.name)
-            .attr('d', path).style('stroke', 'gray').style('stroke-width', 1);
-        })
         
         var zoom = d3.zoom()
             .scaleExtent([1, 8])
@@ -62,32 +55,57 @@
 
         var minCountry;
         var maxCountry;
-        
+
+        var countriesKickstarter = [];
+
         function getPopulation() {
             const countriesJson = fetch('data/world.json').then(response => response.json())
                 .then(country => {
                     minPopulation = country[0].Population;
                     maxPopulation = country[0].Population;
                     
-                    console.log(countries.length);
-
                     for (let i = 0; i < country.length; i++) {
-                        if (minPopulation > country[i].Population && countries.includes(country[i].Country)) {
-                            minPopulation = country[i].Population;
-                            minCountry = country[i].Country;
+                        if (countries.includes(country[i].Country)) {
+                            if (minPopulation > country[i].Population) {
+                                minPopulation = country[i].Population;
+                                minCountry = country[i].Country;
+                            }
+                            if (maxPopulation < country[i].Population) {
+                                maxPopulation = country[i].Population;
+                                maxCountry = country[i].Country;
+                            }
+                            countriesKickstarter.push(country[i]);
                         }
-                        if (maxPopulation < country[i].Population && countries.includes(country[i].Country)) {
-                            maxPopulation = country[i].Population;
-                            maxCountry = country[i].Country;
+                        if (i === country.length - 1) {
+                            drawMap();
                         }
                     }
-                    console.log(minPopulation);
-                    console.log(minCountry);
-                    console.log("-------------");
-                    console.log(maxPopulation);
-                    console.log(maxCountry);
                 });
-            };
+        };
+        
+            
+        function drawMap() {
+            var populationColors = d3.scaleLinear()
+                .domain([minPopulation, maxPopulation])
+                .range(["#8afa6b", "#1e4214"]);
+
+            d3.json('data/world_map.json').then(data => {
+                const countries = topojson.feature(data, data.objects.countries);
+
+                g.selectAll('path').data(countries.features).enter().append('path').attr('class', 'country').attr('id', d => d.properties.name)
+                .attr('d', path).style('stroke', 'darkgray').style('stroke-width', 1).style('fill', function(d) {
+                    if (d.properties.kickstarter) {
+                        var index = countriesKickstarter.findIndex(object => {
+                                if (object.Country === d.properties.name) {
+                                    return object
+                                }
+                            });
+                        return populationColors(countriesKickstarter[index].Population)
+                    }
+                    return "lightgray"
+                });
+            })
+        }
 
         svg.call(zoom);
     </script>
