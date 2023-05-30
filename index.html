@@ -29,7 +29,6 @@
                 .attr('transform', d3.event.transform);
         });
 
-
         var countries = [];     // 22
         var categories = [];    //15
         var populations = [];
@@ -51,7 +50,7 @@
 
                     if (!categories.includes(project[i].Category)) {
                         categories.push(project[i].Category);
-                        var object = { category: project[i].Category, value: 0 }
+                        var object = { category: project[i].Category, value: 0, backers: 0 }
                         data.push(object);
                     }
                 }
@@ -132,6 +131,7 @@
                 }).on('mouseout', function(d) {
                     tooltipDiv.style('opacity', 0);
                 }).on('click', function(d) {
+                    clearData();
                     countCategories(d.properties.name);
                     setTimeout(function() {
                         drawPie();
@@ -148,6 +148,7 @@
                         for (let j = 0; j < data.length; j++) {
                             if (data[j].category === project[i].Category) {
                                 data[j].value += 1;
+                                data[j].backers += project[i].Backers
                             }
                         }
                     }
@@ -172,7 +173,7 @@
         var outerRadius = 200;
         var innerRadius = 0;
     
-        var svg2 = d3.select("body")
+        var svgPie = d3.select("body")
                 .append("svg")
                 .attr("width", pieWidth)
                 .attr("height", pieHeight)
@@ -183,10 +184,9 @@
                 .attr("class", "tooltipPie")
                 .style("opacity", 0);
 
-
             d3.select(".pieSvg").remove();
 
-            svg2 = d3.select("body")
+            svgPie = d3.select("body")
                 .append("svg")
                 .attr("width", pieWidth)
                 .attr("height", pieHeight)
@@ -199,7 +199,7 @@
             var pie = d3.pie()
                 .value(function(d) { return d.value; });
 
-            var pieArcs = svg2.selectAll("g.pie")
+            var pieArcs = svgPie.selectAll("g.pie")
                 .data(pie(data))
                 .enter()
                 .append("g")
@@ -212,7 +212,6 @@
                 .on('mouseover', function(d) {
                     var position = d3.event;
                     setTimeout(function () {
-                        console.log(d)
                         tooltipPieDiv.style('opacity', .9);
                         tooltipPieDiv.html(d.data.category + '<br/>' + d.value).style('left', position.pageX + 'px')
                             .style('top', (position.pageY - 2) + 'px');
@@ -221,23 +220,79 @@
                     tooltipPieDiv.style('opacity', 0);
                 });
                 
-            clearData();
+            drawBar();
         }
+
+        var barWidth = 800;
+        var barHeight = 900;
+        var barMargin = { top: 50, bottom: 150, left: 100, right: 50 };
+
+        var svgBar = d3.select('body')
+                .append('svg')
+                .attr('width', barWidth - barMargin.left - barMargin.right)
+                .attr('height', barHeight - barMargin.top - barMargin.bottom)
+                .attr('viewBox', [0, 0, barWidth, barHeight])
+                .attr('class', 'barSvg');
+
+        function drawBar() {
+            d3.select(".barSvg").remove();
+
+            svgBar = d3.select('body')
+                .append('svg')
+                .attr('width', barWidth - barMargin.left - barMargin.right)
+                .attr('height', barHeight - barMargin.top - barMargin.bottom)
+                .attr('viewBox', [0, 0, barWidth, barHeight])
+                .attr('class', 'barSvg');
+
+            const x = d3.scaleBand()
+                .domain(d3.range(data.length))
+                .range([barMargin.left, barWidth - barMargin.right])
+                .padding(0.1)
+            
+            const y = d3.scaleLinear()
+                .domain([0, 200000])
+                .range([barHeight - barMargin.bottom, barMargin.top])
+
+            svgBar.append('g')
+                .attr('fill', 'royalBlue')
+                .selectAll('rect')
+                .data(data.sort((a, b) => d3.descending(a.backers, b.backers)))
+                .join('rect')
+                    .attr('x', (d, i) => x(i))
+                    .attr('y', (d) => y(d.backers))
+                    .attr('height', d => y(0) - y(d.backers))
+                    .attr('width', x.bandwidth())
+
+            svgBar.append('g').call(xAxis)
+            svgBar.append('g').call(yAxis)
+
+            function xAxis(g) {
+                g.attr('transform', `translate(0, ${barHeight - barMargin.bottom})`)
+                .call(d3.axisBottom(x).tickFormat(i => data[i].category))
+                .selectAll("text")  
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-65)")
+                .attr('font-size', '20px');
+            }
+            
+            function yAxis(g) {
+                g.attr('transform', `translate(${barMargin.left}, 0)`)
+                .call(d3.axisLeft(y).ticks(null, data.format))
+                .attr('font-size', '20px')
+            }
+
+            svg.node();
+        }
+
 
         function clearData() {
             for (let i = 0; i < data.length; i++) {
                 data[i].value = 0;
+                data[i].backers = 0;
             }
         }
-        // pieArcs.append("text")
-        //     .attr("transform", function(d) { return "translate(" +  arc.centroid(d) + ")"; })
-        //     .attr("text-anchor", "middle")
-        //     .text(function(d) { return d.value; });
-
-        // pieArcs.append("text")
-        //         .attr("transform", function (d) { return "translate(" + arc.centroid(d)[0] + "," + (arc.centroid(d)[1] + 15) + ")"; })
-        //         .attr("text-anchor", "middle")
-        //         .text(function (d) { return d.data.name; });
 
         svg.call(zoom);
     </script>
