@@ -33,6 +33,14 @@
         var countries = [];     // 22
         var categories = [];    //15
         var populations = [];
+        
+        var data = [];
+
+        var colors = ["#FF6384", "#36A2EB ", "#4444FF ",
+                      "#4BC0C0 ", "#FF9F40 ", "#FF3333 ",
+                      "#FDCB6E ", "#27AE60 ", "#E84A5F ",
+                      "#2ECC71 ", "#964B00 ", "#F9690E ",
+                      "#9B59B6 ", "#F39C12 ", "#1ABC9C "];
 
         const kickstarterJson = fetch('data/kickstarter.json').then(response => response.json())
             .then(project => {
@@ -43,6 +51,8 @@
 
                     if (!categories.includes(project[i].Category)) {
                         categories.push(project[i].Category);
+                        var object = { category: project[i].Category, value: 0 }
+                        data.push(object);
                     }
                 }
 
@@ -89,8 +99,8 @@
         
             
         function drawMap() {
-            var tooltipDiv = d3.select("body").append("div")    
-                .attr("class", "tooltip")               
+            var tooltipDiv = d3.select("body").append("div")
+                .attr("class", "tooltip")
                 .style("opacity", 0);
 
             var populationColors = d3.scaleLinear()
@@ -121,8 +131,28 @@
                     }, 4)
                 }).on('mouseout', function(d) {
                     tooltipDiv.style('opacity', 0);
+                }).on('click', function(d) {
+                    countCategories(d.properties.name);
+                    setTimeout(function() {
+                        drawPie();
+                    }, 200)
                 });
             })
+        }
+
+        function countCategories(name) {
+            var json = fetch('data/kickstarter.json').then(response => response.json())
+            .then(project => {
+                for (let i = 0; i < project.length; i++) {
+                    if (project[i].Country === name) {
+                        for (let j = 0; j < data.length; j++) {
+                            if (data[j].category === project[i].Category) {
+                                data[j].value += 1;
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function getCountryPopulation(name) {
@@ -135,6 +165,79 @@
                     };
                 });
         }
+
+        // Pie chart
+        var pieWidth = 500;
+        var pieHeight = 500;
+        var outerRadius = 200;
+        var innerRadius = 0;
+    
+        var svg2 = d3.select("body")
+                .append("svg")
+                .attr("width", pieWidth)
+                .attr("height", pieHeight)
+                .attr("class", "pieSvg");
+                
+        function drawPie() {
+            var tooltipPieDiv = d3.select("body").append("div")
+                .attr("class", "tooltipPie")
+                .style("opacity", 0);
+
+
+            d3.select(".pieSvg").remove();
+
+            svg2 = d3.select("body")
+                .append("svg")
+                .attr("width", pieWidth)
+                .attr("height", pieHeight)
+                .attr("class", "pieSvg");
+
+            var arc = d3.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+        
+            var pie = d3.pie()
+                .value(function(d) { return d.value; });
+
+            var pieArcs = svg2.selectAll("g.pie")
+                .data(pie(data))
+                .enter()
+                .append("g")
+                .attr("class", "pie")
+                .attr("transform", "translate(" + (pieWidth / 2) + ", " + (pieHeight / 2) +")");
+
+            pieArcs.append("path")
+                .attr("fill", function(d, i) { return colors[i]; })
+                .attr("d", arc)
+                .on('mouseover', function(d) {
+                    var position = d3.event;
+                    setTimeout(function () {
+                        console.log(d)
+                        tooltipPieDiv.style('opacity', .9);
+                        tooltipPieDiv.html(d.data.category + '<br/>' + d.value).style('left', position.pageX + 'px')
+                            .style('top', (position.pageY - 2) + 'px');
+                    }, 4)
+                }).on('mouseout', function(d) {
+                    tooltipPieDiv.style('opacity', 0);
+                });
+                
+            clearData();
+        }
+
+        function clearData() {
+            for (let i = 0; i < data.length; i++) {
+                data[i].value = 0;
+            }
+        }
+        // pieArcs.append("text")
+        //     .attr("transform", function(d) { return "translate(" +  arc.centroid(d) + ")"; })
+        //     .attr("text-anchor", "middle")
+        //     .text(function(d) { return d.value; });
+
+        // pieArcs.append("text")
+        //         .attr("transform", function (d) { return "translate(" + arc.centroid(d)[0] + "," + (arc.centroid(d)[1] + 15) + ")"; })
+        //         .attr("text-anchor", "middle")
+        //         .text(function (d) { return d.data.name; });
 
         svg.call(zoom);
     </script>
