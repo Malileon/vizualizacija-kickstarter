@@ -6,6 +6,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <script src='http://d3js.org/d3.v5.min.js' charset='utf-8'></script>
     <script src='http://d3js.org/topojson.v1.min.js'></script>
+    <link rel="stylesheet" href="style.css">
     <title>Document</title>
 </head>
 <body>
@@ -13,7 +14,8 @@
         const width = 1100;
         const height = 750;
 
-        const svg = d3.select('body').append('svg').attr('width', width).attr('height', height);
+        const svg = d3.select('body').append('svg').attr('width', width).attr('height', height)
+            .attr('border-style', 'solid');
 
         const projection = d3.geoMercator().scale(180).translate([width / 2.1, height / 1.43]);
         const path = d3.geoPath(projection);
@@ -30,6 +32,7 @@
 
         var countries = [];     // 22
         var categories = [];    //15
+        var populations = [];
 
         const kickstarterJson = fetch('data/kickstarter.json').then(response => response.json())
             .then(project => {
@@ -57,6 +60,7 @@
         var maxCountry;
 
         var countriesKickstarter = [];
+        var selectedPopulation;
 
         function getPopulation() {
             const countriesJson = fetch('data/world.json').then(response => response.json())
@@ -85,6 +89,10 @@
         
             
         function drawMap() {
+            var tooltipDiv = d3.select("body").append("div")    
+                .attr("class", "tooltip")               
+                .style("opacity", 0);
+
             var populationColors = d3.scaleLinear()
                 .domain([minPopulation, maxPopulation])
                 .range(["#8afa6b", "#1e4214"]);
@@ -103,8 +111,29 @@
                         return populationColors(countriesKickstarter[index].Population)
                     }
                     return "lightgray"
+                }).on('mouseover', function(d) {
+                    getCountryPopulation(d.properties.name)
+                    var position = d3.event;
+                    setTimeout(function () {
+                        tooltipDiv.style('opacity', .9);
+                        tooltipDiv.html(d.properties.name + '<br/> Population: ' + selectedPopulation).style('left', position.pageX + 'px')
+                            .style('top', (position.pageY - 28) + 'px');
+                    }, 4)
+                }).on('mouseout', function(d) {
+                    tooltipDiv.style('opacity', 0);
                 });
             })
+        }
+
+        function getCountryPopulation(name) {
+            const countriesJson = fetch('data/world.json').then(response => response.json())
+                .then(country => {
+                    for (let i = 0; i < country.length; i++) {
+                        if (country[i].Country === name) {
+                            selectedPopulation = country[i].Population;
+                        }
+                    };
+                });
         }
 
         svg.call(zoom);
