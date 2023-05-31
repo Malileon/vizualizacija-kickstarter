@@ -50,7 +50,7 @@
 
                     if (!categories.includes(project[i].Category)) {
                         categories.push(project[i].Category);
-                        var object = { category: project[i].Category, value: 0, backers: 0 }
+                        var object = { category: project[i].Category, value: 0, backers: 0, colorIndex: data.length}
                         data.push(object);
                     }
                 }
@@ -61,7 +61,6 @@
                 getPopulation();
             });
         
-
         var maxPopulation = 0;
         var minPopulation = 0;
 
@@ -96,7 +95,6 @@
                 });
         };
         
-            
         function drawMap() {
             var tooltipDiv = d3.select("body").append("div")
                 .attr("class", "tooltip")
@@ -132,10 +130,12 @@
                     tooltipDiv.style('opacity', 0);
                 }).on('click', function(d) {
                     clearData();
-                    countCategories(d.properties.name);
-                    setTimeout(function() {
-                        drawPie();
-                    }, 200)
+                    if (countriesKickstarter.some(e => e.Country === d.properties.name)) {
+                        countCategories(d.properties.name);
+                        setTimeout(function() {
+                            drawPie();
+                        }, 200)
+                    }
                 });
             })
         }
@@ -167,7 +167,7 @@
                 });
         }
 
-        // Pie chart
+
         var pieWidth = 500;
         var pieHeight = 500;
         var outerRadius = 200;
@@ -183,8 +183,6 @@
             var tooltipPieDiv = d3.select("body").append("div")
                 .attr("class", "tooltipPie")
                 .style("opacity", 0);
-
-            d3.select(".pieSvg").remove();
 
             svgPie = d3.select("body")
                 .append("svg")
@@ -207,7 +205,7 @@
                 .attr("transform", "translate(" + (pieWidth / 2) + ", " + (pieHeight / 2) +")");
 
             pieArcs.append("path")
-                .attr("fill", function(d, i) { return colors[i]; })
+                .attr("fill", function(d) { return colors[d.data.colorIndex]; })
                 .attr("d", arc)
                 .on('mouseover', function(d) {
                     var position = d3.event;
@@ -223,6 +221,7 @@
             drawBar();
         }
 
+
         var barWidth = 800;
         var barHeight = 900;
         var barMargin = { top: 50, bottom: 150, left: 100, right: 50 };
@@ -235,8 +234,6 @@
                 .attr('class', 'barSvg');
 
         function drawBar() {
-            d3.select(".barSvg").remove();
-
             svgBar = d3.select('body')
                 .append('svg')
                 .attr('width', barWidth - barMargin.left - barMargin.right)
@@ -250,11 +247,10 @@
                 .padding(0.1)
             
             const y = d3.scaleLinear()
-                .domain([0, 200000])
+                .domain([0, getMaxBackers()])
                 .range([barHeight - barMargin.bottom, barMargin.top])
 
             svgBar.append('g')
-                .attr('fill', 'royalBlue')
                 .selectAll('rect')
                 .data(data.sort((a, b) => d3.descending(a.backers, b.backers)))
                 .join('rect')
@@ -262,6 +258,7 @@
                     .attr('y', (d) => y(d.backers))
                     .attr('height', d => y(0) - y(d.backers))
                     .attr('width', x.bandwidth())
+                    .attr('fill', function(d) { return colors[d.colorIndex]; })
 
             svgBar.append('g').call(xAxis)
             svgBar.append('g').call(yAxis)
@@ -283,11 +280,28 @@
                 .attr('font-size', '20px')
             }
 
+            function getMaxBackers() {
+                var firstNumber, maxBackers = data[0].backers;
+                
+                data.forEach(element => {
+                    if (element.backers > maxBackers) maxBackers = element.backers;
+                })
+                firstNumber = parseInt(maxBackers.toString()[0]) + 1;
+
+                for (var i = 1; i < maxBackers.toString().length; i++) {
+                    firstNumber *= 10;
+                }
+                
+                return firstNumber;
+            }
+
             svg.node();
         }
 
-
         function clearData() {
+            d3.select(".pieSvg").remove();
+            d3.select(".barSvg").remove();
+
             for (let i = 0; i < data.length; i++) {
                 data[i].value = 0;
                 data[i].backers = 0;
