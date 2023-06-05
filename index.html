@@ -11,11 +11,14 @@
 </head>
 <body>
     <script>
+        var title = d3.select('body').append('div').attr('class', 'title').html('Prikaz kickstarter projekata u odnosu na populaciju')
+        var countryName = d3.select('body').append('div').attr('class', 'country')
+
         const width = 1100;
         const height = 750;
 
         const svg = d3.select('body').append('svg').attr('width', width).attr('height', height)
-            .attr('border-style', 'solid');
+            .attr('class', 'worldMap');
 
         const projection = d3.geoMercator().scale(180).translate([width / 2.1, height / 1.43]);
         const path = d3.geoPath(projection);
@@ -125,7 +128,7 @@
                         tooltipDiv.style('opacity', .9);
                         tooltipDiv.html(d.properties.name + '<br/> Population: ' + selectedPopulation).style('left', position.pageX + 'px')
                             .style('top', (position.pageY - 28) + 'px');
-                    }, 4)
+                    }, 10)
                 }).on('mouseout', function(d) {
                     tooltipDiv.style('opacity', 0);
                 }).on('click', function(d) {
@@ -134,7 +137,11 @@
                         countCategories(d.properties.name);
                         setTimeout(function() {
                             drawPie();
+                            countryName.html(d.properties.name)
                         }, 200)
+                    }
+                    else {
+                        countryName.html('');
                     }
                 });
             })
@@ -168,23 +175,25 @@
         }
 
 
-        var pieWidth = 500;
-        var pieHeight = 500;
-        var outerRadius = 200;
+        var pieWidth = 600;
+        var pieHeight = 320;
+        var outerRadius = 160;
         var innerRadius = 0;
+
+        var tooltipPieDiv = d3.select("body").append("div")
+                .attr("class", "tooltipPie")
+                .style("opacity", 0);
     
         var svgPie = d3.select("body")
+                .append("div")
+                .attr("class", "wrapper")
                 .append("svg")
                 .attr("width", pieWidth)
                 .attr("height", pieHeight)
                 .attr("class", "pieSvg");
                 
         function drawPie() {
-            var tooltipPieDiv = d3.select("body").append("div")
-                .attr("class", "tooltipPie")
-                .style("opacity", 0);
-
-            svgPie = d3.select("body")
+            svgPie = d3.select(".wrapper")
                 .append("svg")
                 .attr("width", pieWidth)
                 .attr("height", pieHeight)
@@ -204,8 +213,12 @@
                 .attr("class", "pie")
                 .attr("transform", "translate(" + (pieWidth / 2) + ", " + (pieHeight / 2) +")");
 
+            var projectsSum = 0;
+
             pieArcs.append("path")
-                .attr("fill", function(d) { return colors[d.data.colorIndex]; })
+                .attr("fill", function(d) { 
+                        projectsSum = projectsSum + d.value;
+                        return colors[d.data.colorIndex]; })
                 .attr("d", arc)
                 .on('mouseover', function(d) {
                     var position = d3.event;
@@ -217,16 +230,26 @@
                 }).on('mouseout', function(d) {
                     tooltipPieDiv.style('opacity', 0);
                 });
-                
+
+            var legend = svgPie.selectAll('.path')
+                .data(pie(data))
+                .enter().filter(function(d) { 
+                    if (d.index === 0)
+                    return d; 
+                }).append('g')
+                .attr('transform', 'translate(' + (pieWidth - 180) + ',' + (pieHeight - 10) + ')')
+                .append('text')
+                .html('Ukupno projekata: ' + projectsSum);
+
             drawBar();
         }
 
 
-        var barWidth = 800;
-        var barHeight = 900;
-        var barMargin = { top: 50, bottom: 150, left: 100, right: 50 };
+        var barWidth = 700;
+        var barHeight = 700;
+        var barMargin = { top: 20, bottom: 160, left: 100, right: 50 };
 
-        var svgBar = d3.select('body')
+        var svgBar = d3.select('.wrapper')
                 .append('svg')
                 .attr('width', barWidth - barMargin.left - barMargin.right)
                 .attr('height', barHeight - barMargin.top - barMargin.bottom)
@@ -234,7 +257,7 @@
                 .attr('class', 'barSvg');
 
         function drawBar() {
-            svgBar = d3.select('body')
+            svgBar = d3.select('.wrapper')
                 .append('svg')
                 .attr('width', barWidth - barMargin.left - barMargin.right)
                 .attr('height', barHeight - barMargin.top - barMargin.bottom)
@@ -254,11 +277,27 @@
                 .selectAll('rect')
                 .data(data.sort((a, b) => d3.descending(a.backers, b.backers)))
                 .join('rect')
-                    .attr('x', (d, i) => x(i))
-                    .attr('y', (d) => y(d.backers))
-                    .attr('height', d => y(0) - y(d.backers))
-                    .attr('width', x.bandwidth())
-                    .attr('fill', function(d) { return colors[d.colorIndex]; })
+                .attr('x', (d, i) => x(i))
+                .attr('y', (d) => y(d.backers))
+                .attr('height', d => y(0) - y(d.backers))
+                .attr('width', x.bandwidth())
+                .attr('fill', function(d) { return colors[d.colorIndex]; })
+                .on('mouseover', function(d) {
+                    var position = d3.event;
+                    setTimeout(function () {
+                        tooltipPieDiv.style('opacity', .9);
+                        tooltipPieDiv.html(d.category + '<br/>' + d.backers).style('left', position.pageX + 'px')
+                            .style('top', (position.pageY - 2) + 'px');
+                    }, 4)
+                }).on('mouseout', function(d) {
+                    tooltipPieDiv.style('opacity', 0);
+                });
+
+                svgBar.append('text')
+                    .attr('class', 'yos')
+                    .attr('text-anchor', 'end')
+                    .attr('transform', 'rotate(-90)')
+                    .text('Broj podržavaća (donatora)')
 
             svgBar.append('g').call(xAxis)
             svgBar.append('g').call(yAxis)

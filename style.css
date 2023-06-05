@@ -1,7 +1,7 @@
 div.tooltip, div.tooltipPieDiv {   
     position: absolute;         
     text-align: center;         
-    width: 80px;                    
+    width: 100px;                    
     height: 42px;                   
     padding: 2px;               
     font: 12px sans-serif;      
@@ -22,4 +22,44 @@ div.tooltip, div.tooltipPieDiv {
     border: 0px;        
     border-radius: 8px;         
     pointer-events: none;     
+}
+
+.wrapper, .worldMap {
+    display: inline-flex;
+}
+
+.wrapper {
+    float:right;
+    flex-direction: column;
+    margin-right: 8%;
+}
+
+.pieSvg {
+    align-self: center;
+}
+
+.title {
+    max-width: 1100px;
+    margin-right: 0px;
+    font-size: 3em;
+    text-align: center;
+}
+
+.country {
+    overflow: hidden;
+    width: 30%;
+    margin-left: 62%;
+    margin-right: 8%;
+    margin-top: -1em;
+    font-size: 3em;
+    display: flex;
+    justify-content: center;
+}
+
+.worldMap {
+    margin-top: 3em;
+}
+
+.yos {
+    font-size: 1.8em;
 }
